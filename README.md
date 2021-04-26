@@ -45,9 +45,9 @@ Third party licenses are listed below.
 Docker
 ======
 
-Docker image is available at [Docker Hub](https://hub.docker.com/r/farrukhmpk/html-pdf-service/) 
+Docker image is available at [Docker Hub](https://hub.docker.com/r/vandalton/html-pdf-service/) 
 
-<code>docker pull farrukhmpk/html-pdf-service</code>
+<code>docker pull vandalton/html-pdf-service</code>
 
 Build
 ======

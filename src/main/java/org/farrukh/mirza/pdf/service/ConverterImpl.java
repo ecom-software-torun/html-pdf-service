@@ -18,85 +18,116 @@
  * }}}
  */
 
-
 /**
  * @author Farrukh Mirza
- * 24/06/2016 
+ * 24/06/2016
  * Dublin, Ireland
  */
 package org.farrukh.mirza.pdf.service;
 
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
+import java.io.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.*;
 import java.util.List;
-
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.farrukh.mirza.pdf.spi.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.extend.FontResolver;
+import org.xhtmlrenderer.pdf.ITextFontResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 @Service
 public class ConverterImpl extends BaseImpl implements Converter {
-	private static final Logger logger = LoggerFactory.getLogger(ConverterImpl.class);
 
-	@Override
-	public void convertHtmlToPdf(String html, OutputStream out) {
-		convertHtmlToPdf(html, null, out);
-	}
+  private static final Logger logger = LoggerFactory.getLogger(
+    ConverterImpl.class
+  );
 
-	@Override
-	public void convertHtmlToPdf(String html, String css, OutputStream out) {
-		try {
-			html = correctHtml(html);
-			html = getFormedHTMLWithCSS(html, css);
+  @Override
+  public void convertHtmlToPdf(String html, OutputStream out) {
+    convertHtmlToPdf(html, null, out);
+  }
 
-			//This ITextRenderer is from the Flying Saucer library under LGPL license.
-			//Should not be confused with the actual iText library.
-			ITextRenderer r = new ITextRenderer();
-			r.setDocumentFromString(html);
-			r.layout();
-			r.createPDF(out);
-			r.finishPDF();
+  @Override
+  public void convertHtmlToPdf(String html, String css, OutputStream out) {
+    try {
+      html = correctHtml(html);
+      html = getFormedHTMLWithCSS(html, css);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-		}
-	}
+      //This ITextRenderer is from the Flying Saucer library under LGPL license.
+      //Should not be confused with the actual iText library.
+      ITextRenderer r = new ITextRenderer();
 
-	@Override
-	public void convertHtmlToPdf(List<String> htmls, OutputStream out) {
-		convertHtmlToPdf(htmls, null, out);
-	}
+      addFontDirectory(r.getFontResolver(), "/usr/share/fonts/TTF/");
 
-	@Override
-	public void convertHtmlToPdf(List<String> htmls, String css, OutputStream out) {
-		try {
-			PDFMergerUtility merge = new PDFMergerUtility();
+      r.setDocumentFromString(html);
+      r.layout();
 
-			for (String html : htmls) {
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      r.createPDF(out);
+      r.finishPDF();
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error(e.getMessage(), e);
+    }
+  }
 
-				// convertHtmlToPdf() performs null check on css by default, so
-				// no need to do it here.
-				convertHtmlToPdf(html, css, bos);
+  @Override
+  public void convertHtmlToPdf(List<String> htmls, OutputStream out) {
+    convertHtmlToPdf(htmls, null, out);
+  }
 
-				ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-				merge.addSource(bis);
-			}
+  @Override
+  public void convertHtmlToPdf(
+    List<String> htmls,
+    String css,
+    OutputStream out
+  ) {
+    try {
+      PDFMergerUtility merge = new PDFMergerUtility();
 
-			merge.setDestinationStream(out);
-			merge.mergeDocuments(null);
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-		}
-	}
+      for (String html : htmls) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
+        // convertHtmlToPdf() performs null check on css by default, so
+        // no need to do it here.
+        convertHtmlToPdf(html, css, bos);
 
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        merge.addSource(bis);
+      }
+
+      merge.setDestinationStream(out);
+      merge.mergeDocuments(null);
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e.getMessage(), e);
+    }
+  }
+
+  private void addFontDirectory(ITextFontResolver r, String dir)
+    throws DocumentException, IOException {
+    File f = new File(dir);
+    if (f.isDirectory()) {
+      File[] files = f.listFiles(
+        new FilenameFilter() {
+          public boolean accept(File dir, String name) {
+            String lower = name.toLowerCase();
+            return lower.endsWith(".ttf");
+          }
+        }
+      );
+      for (int i = 0; i < files.length; i++) {
+        r.addFont(files[i].getAbsolutePath(), BaseFont.IDENTITY_H, true);
+      }
+    }
+  }
 }

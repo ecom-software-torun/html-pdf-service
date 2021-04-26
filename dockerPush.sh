@@ -16,5 +16,5 @@
 #!/bin/bash
 #sudo env "PATH=$PATH" mvn dockerfile:push
 sudo docker login
-sudo docker push farrukhmpk/html-pdf-service:latest
+sudo docker push vandalton/html-pdf-service:latest
 

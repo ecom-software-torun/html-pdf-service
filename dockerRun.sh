@@ -14,5 +14,5 @@
 #   limitations under the License.
 #
 #!/bin/bash
-sudo docker run -e "SPRING_PROFILES_ACTIVE=DEVELOPMENT" –p 8080:8080 -v /opt/html-pdf-service-volume:/logs farrukhmpk/html-pdf-service
+sudo docker run -e "SPRING_PROFILES_ACTIVE=DEVELOPMENT" –p 8080:8080 -v /opt/html-pdf-service-volume:/logs vandalton/html-pdf-service
 

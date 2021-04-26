@@ -19,9 +19,9 @@
 	<packaging>war</packaging>
 
 	<scm>
-		<connection>scm:git:git://github.com/farrukhmpk/html-pdf-service.git</connection>
-		<developerConnection>scm:git:git@github.com:farrukhmpk/html-pdf-service.git</developerConnection>
-		<url>git://github.com/farrukhmpk/html-pdf-service.git</url>
+		<connection>scm:git:git://github.com/vandalton/html-pdf-service.git</connection>
+		<developerConnection>scm:git:git@github.com:vandalton/html-pdf-service.git</developerConnection>
+		<url>git://github.com/vandalton/html-pdf-service.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -254,7 +254,7 @@
 		<d>$</d>
 		<test.skip>true</test.skip>
 		<log.location>logs</log.location>
-		<docker.image.prefix>farrukhmpk</docker.image.prefix>
+		<docker.image.prefix>vandalton</docker.image.prefix>
 
 		<flyingsaucer.version>9.0.9</flyingsaucer.version>
 		<pdf.box.version>2.0.2</pdf.box.version>

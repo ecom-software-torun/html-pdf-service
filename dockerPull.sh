@@ -15,5 +15,5 @@
 #
 #!/bin/bash
 sudo docker login
-sudo docker pull farrukhmpk/html-pdf-service
+sudo docker pull vandalton/html-pdf-service
 
