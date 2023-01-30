@@ -44,6 +44,8 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.extend.FontResolver;
 import org.xhtmlrenderer.pdf.ITextFontResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfString;
 
 @Service
 public class ConverterImpl extends BaseImpl implements Converter {
@@ -72,7 +74,9 @@ public class ConverterImpl extends BaseImpl implements Converter {
       r.setDocumentFromString(html);
       r.layout();
 
-      r.createPDF(out);
+      r.createPDF(out, false);
+      r.getWriter().getInfo().put(PdfName.PRODUCER, new PdfString("-"));
+      r.getWriter().getInfo().put(PdfName.CREATOR, new PdfString("-"));
       r.finishPDF();
     } catch (Exception e) {
       e.printStackTrace();
