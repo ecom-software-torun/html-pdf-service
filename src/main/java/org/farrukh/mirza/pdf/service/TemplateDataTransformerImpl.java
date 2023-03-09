@@ -35,13 +35,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.farrukh.mirza.pdf.spi.CustomHtmlTagsEnum;
 import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import com.jayway.jsonpath.JsonPath;
 
 @Service
@@ -79,13 +79,13 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 			logger.info("Json Obj: " + jsonObject);
 
 			////// REPEAT TAG CODE - START /////
-			String htmlWithoutRepeatInput = new String(htmlTemplate);
-			String htmlWithoutRepeatOutput = new String(htmlTemplate);
+			String htmlWithoutRepeatInput = htmlTemplate;
+			String htmlWithoutRepeatOutput = htmlTemplate;
 			// Replace all Repeat tags with repeated html
 			// While loop will stop when all repeat tags are replaced and
-			while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(new String(htmlWithoutRepeatInput), "$.",
+			while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.",
 					jsonObject)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
-				htmlWithoutRepeatInput = new String(htmlWithoutRepeatOutput);
+				htmlWithoutRepeatInput = htmlWithoutRepeatOutput;
 			}
 
 			htmlTemplate = htmlWithoutRepeatOutput;
@@ -120,15 +120,15 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 
 			int arrayLength = Integer.parseInt(JsonPath.read(jsonData, "$.length()").toString());
 			for (int i = 0; i < arrayLength; i++) {
-				String htmlTemplatePerObject = new String(htmlTemplate); 
+				String htmlTemplatePerObject = htmlTemplate;
 				////// REPEAT TAG CODE - START /////
-				String htmlWithoutRepeatInput = new String(htmlTemplatePerObject);
-				String htmlWithoutRepeatOutput = new String(htmlTemplatePerObject);
+				String htmlWithoutRepeatInput = htmlTemplatePerObject;
+				String htmlWithoutRepeatOutput = htmlTemplatePerObject;
 				// Replace all Repeat tags with repeated html
 				// While loop will stop when all repeat tags are replaced and
-				while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(new String(htmlWithoutRepeatInput), "$.[" + i + "].",
+				while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.[" + i + "].",
 						jsonData)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
-					htmlWithoutRepeatInput = new String(htmlWithoutRepeatOutput);
+					htmlWithoutRepeatInput = htmlWithoutRepeatOutput;
 				}
 
 				htmlTemplatePerObject = htmlWithoutRepeatOutput;
@@ -139,7 +139,7 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 				//Thus keys can be separate for each json object in the main json array.
 				List<String> keys = getUniqueKeysFromTemplate(htmlTemplatePerObject);
 				Map<String, String> keyVals = getValuesFromJson(keys, "$.[" + i + "].", jsonData);
-				String template = new String(htmlTemplatePerObject);
+				String template = htmlTemplatePerObject;
 				template = transformTemplate(template, keyVals);
 
 //				for (String k : keys) {
@@ -235,16 +235,16 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 			for (String k : keyArrayElement) {
 				logger.debug("Fetching size of array " + jsonSelector + k + ".length()");
 				int arraySize = Integer.parseInt(JsonPath.read(json, jsonSelector + k + ".length()").toString());
-				maxArraySize = arraySize > maxArraySize ? arraySize : maxArraySize;
+				maxArraySize = Math.max(arraySize, maxArraySize);
 			}
 			logger.debug("Maximum number of array elements " + maxArraySize);
 
 			// Now repeat the inner HTML with indexed keys instead of the template key
 			// parent.child[*].name.first will be replaced by parent.child[0].name.first,
 			// then parent.child[1].name.first, ...
-			String indexedInnerHTML = "";
+			StringBuilder indexedInnerHTML = new StringBuilder();
 			for (int i = 0; i < maxArraySize; i++) {
-				String indexedInnerHTMLRow = new String(innerHtml);
+				String indexedInnerHTMLRow = innerHtml;
 				for (String k : keyArrayElement) {
 					logger.debug("Original Search: " + k + "[" + JSON_OBJECT_ARRAY_REPEAT_TAG_WILDCARD + "]");
 					logger.debug("Expected to be replaced with: " + k + "[" + i + "]");
@@ -253,10 +253,10 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 
 					logger.debug("Wildcard converted row " + i + ": " + indexedInnerHTMLRow);
 				}
-				indexedInnerHTML += indexedInnerHTMLRow;
+				indexedInnerHTML.append(indexedInnerHTMLRow);
 			}
 
-			logger.debug(indexedInnerHTML);
+			logger.debug(indexedInnerHTML.toString());
 			// Now replace the original template text containing REPEAT tag with the actual
 			// repetition of indexed HTML
 			// Original: <repeat>{parent.child[*].name.first}
@@ -264,9 +264,9 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 			// Result: {parent.child[0].name.first}
 			// {parent.child[0].name.last}{parent.child[1].name.first}
 			// {parent.child[1].name.last}
-//			template = template.replaceFirst(CustomHtmlTagsEnum.REPEAT.getTagWithInnerHtmlSubstring(template),
-//					indexedInnerHTML);
-			template = CustomHtmlTagsEnum.REPEAT.replaceTagWithInnerHtmlByReplacement(template, indexedInnerHTML);
+			// template = template.replaceFirst(CustomHtmlTagsEnum.REPEAT.getTagWithInnerHtmlSubstring(template),
+			// indexedInnerHTML);
+			template = CustomHtmlTagsEnum.REPEAT.replaceTagWithInnerHtmlByReplacement(template, indexedInnerHTML.toString());
 		}
 		return template;
 	}
@@ -281,14 +281,13 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 		for (String k : keys) {
 			String val = "";
 			try {
-				val = val + JsonPath.read(new String(json), jsonSelector + k);
+				val = val + JsonPath.read(json, jsonSelector + k);
 			} catch (Throwable t) {
 				// val = "N/A";
 				logger.error("Exception while reading key value for " + k + ": " + t.getMessage());
 			}
-			// if(!StringUtils.isBlank(val)){
-			map.put(k, val);
-			// }
+
+			map.put(k, StringEscapeUtils.escapeHtml4(val));
 		}
 
 		return map;

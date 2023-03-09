@@ -70,7 +70,6 @@ public class ConverterImpl extends BaseImpl implements Converter {
       ITextRenderer r = new ITextRenderer();
 
       addFontDirectory(r.getFontResolver(), "/usr/share/fonts/TTF/");
-
       r.setDocumentFromString(html);
       r.layout();
 
