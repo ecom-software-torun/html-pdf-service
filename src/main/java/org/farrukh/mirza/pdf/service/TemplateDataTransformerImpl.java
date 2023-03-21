@@ -288,7 +288,7 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             }
 
             String escaped = StringEscapeHelpers.escapeHtml4WithoutSpecialCharacters(val);
-
+            logger.debug("escaped: " + escaped);
             map.put(k, escaped);
         }
 
