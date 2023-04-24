@@ -34,34 +34,34 @@ import org.farrukh.mirza.pdf.spi.TestDataProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return builder.sources(Application.class);
-	}
+    public static void main(String[] args) {
+        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+    }
 
-	public static void main(String[] args) {
-		ApplicationContext ctx = SpringApplication.run(Application.class, args);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(Application.class);
+    }
 
-	@Bean
-	public Converter getConverter(){
-		return new ConverterImpl();
-	}
-	
-	@Bean
-	public TemplateDataTransformer getTemplateTransformer(){
-		return new TemplateDataTransformerImpl();
-	}
-	
-	@Bean
-	public TestDataProvider getDataProvider(){
-		return new TestDataProviderImpl();
-	}
+    @Bean
+    public Converter getConverter() {
+        return new ConverterImpl();
+    }
+
+    @Bean
+    public TemplateDataTransformer getTemplateTransformer() {
+        return new TemplateDataTransformerImpl();
+    }
+
+    @Bean
+    public TestDataProvider getDataProvider() {
+        return new TestDataProviderImpl();
+    }
 }
