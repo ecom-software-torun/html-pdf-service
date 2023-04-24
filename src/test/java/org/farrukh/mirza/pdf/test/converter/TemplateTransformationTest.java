@@ -25,14 +25,6 @@
  */
 package org.farrukh.mirza.pdf.test.converter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
 import org.farrukh.mirza.pdf.spi.Converter;
 import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
 import org.farrukh.mirza.pdf.spi.TestDataProvider;
@@ -40,45 +32,46 @@ import org.farrukh.mirza.pdf.test.Application;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.List;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-// @SpringApplicationConfiguration(classes=Application.class)
-@SpringApplicationConfiguration(Application.class)
+@SpringBootTest(classes = Application.class)
 public class TemplateTransformationTest {
 
-	@Autowired
-	public Converter converter;
+    @Autowired
+    public Converter converter;
 
-	@Autowired
-	public TemplateDataTransformer transformer;
+    @Autowired
+    public TemplateDataTransformer transformer;
 
-	@Autowired
-	public TestDataProvider dataProvider;
-
-	private String getSimpleHtml() {
-		return dataProvider.getHtmlDoc();
-	}
-
-	private String getHtmlUsingTemplate() {
-		return transformer.transformHTMLTemplate(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataObject());
-	}
-
-	private List<String> getHtmlsUsingTemplate() {
-		return transformer.transformHTMLTemplates(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataArray());
-	}
+    @Autowired
+    public TestDataProvider dataProvider;
 
 
-	@Test
-	public void testHtmlUsingTemplate(){
-		System.out.println(getHtmlUsingTemplate());
-	}
+    private String getHtmlUsingTemplate() {
+        return transformer.transformHTMLTemplate(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataObject());
+    }
 
-	@Test
-	public void testHtmlUsingTemplates(){
-		System.out.println(transformer.transformHTMLTemplates(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataArray()));
-	}
+    private List<String> getHtmlsUsingTemplate() {
+        return transformer.transformHTMLTemplates(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataArray());
+    }
+
+
+    @Test
+    public void testHtmlUsingTemplate() {
+        System.out.println(getHtmlUsingTemplate());
+    }
+
+    @Test
+    public void testHtmlUsingTemplates() {
+        System.out.println(transformer.transformHTMLTemplates(dataProvider.getHtmlTemplateDoc(), dataProvider.getTestDataArray()));
+    }
 
 //	@Test
 //	public void testHtmlToPdfFile() {
@@ -147,27 +140,27 @@ public class TemplateTransformationTest {
 //		}
 //	}
 
-	@Test
-	public void testHtmlTemplateToPdfFileWithCss() {
-		try {
-			OutputStream file = new FileOutputStream(new File("HTMLTemplatetoPDFTestCss.pdf"));
-			converter.convertHtmlToPdf(getHtmlUsingTemplate(), dataProvider.getCssDoc(), file);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    @Test
+    public void testHtmlTemplateToPdfFileWithCss() {
+        try {
+            OutputStream file = new FileOutputStream("HTMLTemplatetoPDFTestCss.pdf");
+            converter.convertHtmlToPdf(getHtmlUsingTemplate(), dataProvider.getCssDoc(), file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Test
-	public void testHtmlTemplatesToPdfFileWithCss() {
-		try {
-			OutputStream file = new FileOutputStream(new File("HTMLTemplatestoPDFTestCss.pdf"));
-			converter.convertHtmlToPdf(getHtmlsUsingTemplate(), dataProvider.getCssDoc(), file);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    @Test
+    public void testHtmlTemplatesToPdfFileWithCss() {
+        try {
+            OutputStream file = new FileOutputStream("HTMLTemplatestoPDFTestCss.pdf");
+            converter.convertHtmlToPdf(getHtmlsUsingTemplate(), dataProvider.getCssDoc(), file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
-	//	@Test
+    //	@Test
 //	public void testHtmlTemplateToPdfByteFileWithCss() {
 //		try {
 //			ByteArrayOutputStream bos = new ByteArrayOutputStream();
