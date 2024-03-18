@@ -71,20 +71,15 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
     }
 
     @Override
-    public String transformHTMLTemplate(String htmlTemplate, String jsonObject) {
+    public String transformHTMLTemplate(String htmlTemplate, String jsonString) {
         try {
-            // Replace &<space> with &amp;
-            jsonObject = jsonObject.replaceAll("(&\\w*)(?!&.*;) ", "&amp; ");
-
-            logger.info("Json Obj: " + jsonObject);
-
             ////// REPEAT TAG CODE - START /////
             String htmlWithoutRepeatInput = htmlTemplate;
             String htmlWithoutRepeatOutput = htmlTemplate;
             // Replace all Repeat tags with repeated html
             // While loop will stop when all repeat tags are replaced and
             while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.",
-                    jsonObject)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
+                    jsonString)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
                 htmlWithoutRepeatInput = htmlWithoutRepeatOutput;
             }
 
@@ -92,30 +87,24 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             ////// REPEAT TAG CODE - END /////
 
             List<String> keys = getUniqueKeysFromTemplate(htmlTemplate);
-            Map<String, String> keyVals = getValuesFromJson(keys, jsonObject);
+            Map<String, String> keyVals = getValuesFromJson(keys, jsonString);
 
-            keys.stream().forEach(k -> logger.trace("Key: " + k));
-            keyVals.entrySet().stream()
-                    .forEach(entry -> logger.trace("Key: " + entry.getKey() + ", Val: " + entry.getValue()));
+            keys.forEach(k -> logger.trace("Key: " + k));
+            keyVals.forEach((key, value) -> logger.trace("Key: " + key + ", Val: " + value));
 
-//			logger.debug(keyVals.get("signatures[0].name"));
 
             return transformTemplate(htmlTemplate, keyVals);
-
-//			return transformTemplate(htmlTemplate, jsonObject);
         } catch (Throwable e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
         }
+
         return htmlTemplate;
     }
 
     @Override
     public List<String> transformHTMLTemplates(String htmlTemplate, String jsonData) {
         try {
-            // Replace &<space> with &amp;
-            jsonData = jsonData.replaceAll("(&\\w*)(?!&.*;) ", "&amp; ");
-
             List<String> html = new ArrayList<>();
 
             int arrayLength = Integer.parseInt(JsonPath.read(jsonData, "$.length()").toString());
@@ -141,38 +130,6 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
                 Map<String, String> keyVals = getValuesFromJson(keys, "$.[" + i + "].", jsonData);
                 String template = htmlTemplatePerObject;
                 template = transformTemplate(template, keyVals);
-
-//				for (String k : keys) {
-//					try {
-//						String val = JsonPath.read(jsonData, "$.[" + i + "]." + k);
-//						if (StringUtils.isBlank(val) || "null".equalsIgnoreCase(val)) {
-//							val = "";
-//						}
-//
-//						template = template.replaceAll("\\{" + k + "\\}", val);
-//
-//						// The following changes were done by James Cummins in
-//						// the
-//						// hope that spaces will be allowed in the keys.
-//						// However, that did not work.
-//						// In addition, because k was placed in brackets, so the
-//						// service is unable to parse nested objects.
-//						// Therefore, these changes are being reverted and some
-//						// other solution will be looked into the future.
-//
-//						// #1 Value type prevents ClassCastException
-//						// #2 k needs to be wrapped in ['k'] in case k has
-//						// spaces
-//						// Object val = JsonPath.read(jsonData,
-//						// "$.["+i+"].['"+k+"']");
-//
-//						// Perform toString() on Object val.
-//						// template = template.replaceAll("\\{" + k + "\\}",
-//						// val!=null?val.toString():"");
-//					} catch (Throwable t) {
-//						logger.warn("Ignoring Exception while reading key value for " + k + ": " + t.getMessage());
-//					}
-//				}
 
                 html.add(template);
             }
