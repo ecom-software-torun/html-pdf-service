@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM eclipse-temurin:21-alpine
 VOLUME /logs
 EXPOSE 8080
 ARG JAR_FILE
