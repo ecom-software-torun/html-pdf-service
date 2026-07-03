@@ -26,7 +26,7 @@ public abstract class BaseImpl {
 	protected final String JSON_OBJECT_ARRAY_REPEAT_TAG_WILDCARD = "\\*";
 
 	protected String getFormedHTMLWithCSS(String htmlBody, String css) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
 		sb.append("<head>");
 		if (StringUtils.isNotBlank(css)) {
@@ -43,7 +43,7 @@ public abstract class BaseImpl {
 	}
 
 	protected String correctHtml(String html) {
-		html = html.replaceAll("&nbsp;", "&#160;");
+		html = html.replace("&nbsp;", "&#160;");
 		html = html.replaceAll("(&\\w*)(?!&.*;) ", "&amp; ");// Replace &<space> with &amp;
 
 		return html;

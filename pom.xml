@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.10</version>
+        <version>3.5.16</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,9 +18,9 @@
     <packaging>war</packaging>
 
     <scm>
-        <connection>scm:git:git://github.com/vandalton/html-pdf-service.git</connection>
-        <developerConnection>scm:git:git@github.com:vandalton/html-pdf-service.git</developerConnection>
-        <url>git://github.com/vandalton/html-pdf-service.git</url>
+        <connection>scm:git:git://github.com/ecom-software-torun/html-pdf-service.git</connection>
+        <developerConnection>scm:git:git@github.com:ecom-software-torun/html-pdf-service.git</developerConnection>
+        <url>git://github.com/ecom-software-torun/html-pdf-service.git</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -161,20 +161,19 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
+            <version>3.20.0</version>
         </dependency>
 
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>7.0</version>
-            <scope>provided</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.13.0</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.22.0</version>
         </dependency>
 
         <dependency>
@@ -194,13 +193,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
+            <version>5.12.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>5.8.1</version>
+            <version>5.12.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -250,14 +249,16 @@
         <d>$</d>
         <test.skip>true</test.skip>
         <log.location>logs</log.location>
-        <docker.image.prefix>vandalton</docker.image.prefix>
+        <docker.image.prefix>ecom</docker.image.prefix>
 
-        <flyingsaucer.version>9.4.0</flyingsaucer.version>
-        <pdf.box.version>2.0.32</pdf.box.version>
+        <flyingsaucer.version>9.13.0</flyingsaucer.version>
+        <pdf.box.version>3.0.7</pdf.box.version>
 
         <application.debug>true</application.debug>
-        <java.version>11</java.version>
-        <snakeyaml.version>2.0</snakeyaml.version>
+        <java.version>25</java.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
+        <tomcat.version>10.1.55</tomcat.version>
+        <thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
     </properties>
 
 

@@ -44,11 +44,11 @@ public enum CustomHtmlTagsEnum {
 	}
 
 	public boolean isStartPresent(String html) {
-		return html.toLowerCase().indexOf(start) >= 0;
+		return html.toLowerCase().contains(start);
 	}
 
 	public boolean isEndPresent(String html) {
-		return html.toLowerCase().indexOf(end) >= 0;
+		return html.toLowerCase().contains(end);
 	}
 
 	public boolean isPresent(String html) {

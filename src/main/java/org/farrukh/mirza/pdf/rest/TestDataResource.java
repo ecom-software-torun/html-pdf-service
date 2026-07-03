@@ -25,7 +25,7 @@
  */
 package org.farrukh.mirza.pdf.rest;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.farrukh.mirza.pdf.spi.TestDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,16 +53,11 @@ public class TestDataResource {
 		
 		String testJson = "{\"html\": \""+StringEscapeUtils.escapeJson(testHtml)+"\", \"css\":\""+StringEscapeUtils.escapeJson(testCSS)+"\"}";
 		
-		logger.debug("This is the Test HTML to PDF wrapper service.");
 		String resp = "This is the Test HTML to PDF wrapper service. " + "All methods are the same and GET. "
 				+ "No need to provide HTML or CSS. <br/> <br/>" + "<h1>Test HTML: </h1>" + testHtml
 				+ " <br/><br/>" + "<h1>Test CSS:</h1>" + testCSS 
 				+ "<br/><br/>" + "<h1>Test JSON:</h1>" + testJson
 				;
-
-		logger.debug("HTML: " + testHtml);
-		logger.debug("CSS: " + testCSS);
-		logger.debug("JSON: " + testJson);
 		
 		return resp;
 	}

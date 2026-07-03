@@ -40,14 +40,7 @@ Third party licenses are listed below.
 4. pdfbox is provided under APACHE License v2
 5. jackson is provided under APACHE License v2
 6. jsonpath 2.2.0 is provided under APACHE License v2 (Applicable expressions can be found at https://github.com/json-path/JsonPath)
-	
-	
-Docker
-======
 
-Docker image is available at [Docker Hub](https://hub.docker.com/r/vandalton/html-pdf-service/) 
-
-<code>docker pull vandalton/html-pdf-service</code>
 
 Build
 ======

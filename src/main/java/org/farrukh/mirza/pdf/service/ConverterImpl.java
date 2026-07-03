@@ -29,6 +29,7 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfString;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.farrukh.mirza.pdf.spi.Converter;
 import org.slf4j.Logger;
@@ -72,7 +73,6 @@ public class ConverterImpl extends BaseImpl implements Converter {
             r.getWriter().getInfo().put(PdfName.CREATOR, new PdfString("-"));
             r.finishPDF();
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage(), e);
         }
     }
@@ -99,13 +99,12 @@ public class ConverterImpl extends BaseImpl implements Converter {
                 convertHtmlToPdf(html, css, bos);
 
                 ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                merge.addSource(bis);
+                merge.addSource(new RandomAccessReadBuffer(bis));
             }
 
             merge.setDestinationStream(out);
             merge.mergeDocuments(null);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error(e.getMessage(), e);
         }
     }
@@ -115,15 +114,14 @@ public class ConverterImpl extends BaseImpl implements Converter {
         File f = new File(dir);
         if (f.isDirectory()) {
             File[] files = f.listFiles(
-                    new FilenameFilter() {
-                        public boolean accept(File dir, String name) {
-                            String lower = name.toLowerCase();
-                            return lower.endsWith(".ttf");
-                        }
+                    (dir1, name) -> {
+                        String lower = name.toLowerCase();
+                        return lower.endsWith(".ttf");
                     }
             );
-            for (int i = 0; i < files.length; i++) {
-                r.addFont(files[i].getAbsolutePath(), BaseFont.IDENTITY_H, true);
+
+            for (File file : files) {
+                r.addFont(file.getAbsolutePath(), BaseFont.IDENTITY_H, true);
             }
         }
     }

@@ -63,8 +63,7 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 
     @Override
     public boolean isJsonArray(String json) {
-        if (StringUtils.isNoneBlank(json) && StringUtils.isNoneBlank(json.trim()) && json.trim().startsWith("[")
-                && json.trim().endsWith("]")) {
+        if (StringUtils.isNoneBlank(json) && StringUtils.isNoneBlank(json.trim()) && json.trim().startsWith("[") && json.trim().endsWith("]")) {
             return true;
         }
         return false;
@@ -73,29 +72,21 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
     @Override
     public String transformHTMLTemplate(String htmlTemplate, String jsonString) {
         try {
-            ////// REPEAT TAG CODE - START /////
             String htmlWithoutRepeatInput = htmlTemplate;
             String htmlWithoutRepeatOutput = htmlTemplate;
             // Replace all Repeat tags with repeated html
             // While loop will stop when all repeat tags are replaced and
-            while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.",
-                    jsonString)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
+            while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.", jsonString)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
                 htmlWithoutRepeatInput = htmlWithoutRepeatOutput;
             }
 
             htmlTemplate = htmlWithoutRepeatOutput;
-            ////// REPEAT TAG CODE - END /////
 
             List<String> keys = getUniqueKeysFromTemplate(htmlTemplate);
             Map<String, String> keyVals = getValuesFromJson(keys, jsonString);
 
-            keys.forEach(k -> logger.trace("Key: " + k));
-            keyVals.forEach((key, value) -> logger.trace("Key: " + key + ", Val: " + value));
-
-
             return transformTemplate(htmlTemplate, keyVals);
         } catch (Throwable e) {
-            e.printStackTrace();
             logger.error(e.getMessage(), e);
         }
 
@@ -110,19 +101,15 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             int arrayLength = Integer.parseInt(JsonPath.read(jsonData, "$.length()").toString());
             for (int i = 0; i < arrayLength; i++) {
                 String htmlTemplatePerObject = htmlTemplate;
-                ////// REPEAT TAG CODE - START /////
                 String htmlWithoutRepeatInput = htmlTemplatePerObject;
                 String htmlWithoutRepeatOutput = htmlTemplatePerObject;
                 // Replace all Repeat tags with repeated html
                 // While loop will stop when all repeat tags are replaced and
-                while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.[" + i + "].",
-                        jsonData)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
+                while (!(htmlWithoutRepeatOutput = transformRepeatTagInTemplate(htmlWithoutRepeatInput, "$.[" + i + "].", jsonData)).equalsIgnoreCase(htmlWithoutRepeatInput)) {
                     htmlWithoutRepeatInput = htmlWithoutRepeatOutput;
                 }
 
                 htmlTemplatePerObject = htmlWithoutRepeatOutput;
-                ////// REPEAT TAG CODE - END /////
-
 
                 //This can't be outside loop because repeat depends on the Json Object
                 //Thus keys can be separate for each json object in the main json array.
@@ -136,38 +123,33 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
 
             return html;
         } catch (Throwable e) {
-            e.printStackTrace();
             logger.error(e.getMessage(), e);
         }
         return new ArrayList<>();
     }
 
     private String transformTemplate(String template, Map<String, String> keyVals) {
-        logger.info("Template: " + template);
         for (Entry<String, String> e : keyVals.entrySet()) {
             if (StringUtils.isBlank(e.getValue()) || "null".equalsIgnoreCase(e.getValue())) {
                 e.setValue("");
             }
+
             //Find [ and ] characters in the keys and replace them with \[ and \] in the keys
             String key = e.getKey();
             key = key.contains("[") ? key.replaceAll("\\[", "\\\\[") : key;
             key = key.contains("]") ? key.replaceAll("\\]", "\\\\]") : key;
-            logger.trace("New key: " + key);
 
             //Then use the formed key to replace values in the text
             template = template.replaceAll("\\{" + key + "\\}", e.getValue());
-//			template = template.replaceAll("\\{" + e.getKey() + "\\}", e.getValue());
         }
 
-        logger.info("Template Result: " + template);
         return template;
     }
 
     private String transformRepeatTagInTemplate(String template, String jsonSelector, String json) {
         if (CustomHtmlTagsEnum.REPEAT.isPresentAndValid(template)) {
-            logger.debug("JSON: " + json);
             final String innerHtml = CustomHtmlTagsEnum.REPEAT.getInnerHtml(template);
-            logger.debug("Inner HTML: " + innerHtml);
+
             // Get all unique keys from the innerHTML of the <repeat>...</repeat> tag
             // The resulting keys in the list would be like below as an example:
             // 1. parent.child[*].name.first
@@ -175,6 +157,7 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             // 3. parent.child[*].dob
             // 4. parent.child[*].address
             List<String> keys = getUniqueKeysFromTemplate(innerHtml);
+
             // Now get the array part(s) separated and unique, e.g., the list from above
             // example will result in a hash set of a single element, i.e.,
             // --> parent.child
@@ -182,6 +165,7 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             for (String k : keys) {
                 keyArrayElement.add(k.substring(0, k.indexOf("[")));
             }
+
             // Next find among all arrays referenced under the repeat tag, which one has the
             // most elements.
             // Assumption: If multiple arrays are referenced, then all are assumed to be of
@@ -190,11 +174,9 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             // tags are not allowed
             int maxArraySize = 0;
             for (String k : keyArrayElement) {
-                logger.debug("Fetching size of array " + jsonSelector + k + ".length()");
                 int arraySize = Integer.parseInt(JsonPath.read(json, jsonSelector + k + ".length()").toString());
                 maxArraySize = Math.max(arraySize, maxArraySize);
             }
-            logger.debug("Maximum number of array elements " + maxArraySize);
 
             // Now repeat the inner HTML with indexed keys instead of the template key
             // parent.child[*].name.first will be replaced by parent.child[0].name.first,
@@ -202,18 +184,15 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
             StringBuilder indexedInnerHTML = new StringBuilder();
             for (int i = 0; i < maxArraySize; i++) {
                 String indexedInnerHTMLRow = innerHtml;
-                for (String k : keyArrayElement) {
-                    logger.debug("Original Search: " + k + "[" + JSON_OBJECT_ARRAY_REPEAT_TAG_WILDCARD + "]");
-                    logger.debug("Expected to be replaced with: " + k + "[" + i + "]");
-                    indexedInnerHTMLRow = indexedInnerHTMLRow.replaceAll(
-                            k + "\\[" + JSON_OBJECT_ARRAY_REPEAT_TAG_WILDCARD + "\\]", k + "\\[" + i + "\\]");
 
-                    logger.debug("Wildcard converted row " + i + ": " + indexedInnerHTMLRow);
+                for (String k : keyArrayElement) {
+                    indexedInnerHTMLRow = indexedInnerHTMLRow.replaceAll(k + "\\[" + JSON_OBJECT_ARRAY_REPEAT_TAG_WILDCARD + "\\]", k + "\\[" + i + "\\]");
+
                 }
+
                 indexedInnerHTML.append(indexedInnerHTMLRow);
             }
 
-            logger.debug(indexedInnerHTML.toString());
             // Now replace the original template text containing REPEAT tag with the actual
             // repetition of indexed HTML
             // Original: <repeat>{parent.child[*].name.first}
@@ -241,11 +220,11 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
                 val = val + JsonPath.read(json, jsonSelector + k);
             } catch (Throwable t) {
                 // val = "N/A";
-                logger.error("Exception while reading key value for " + k + ": " + t.getMessage());
+                logger.error("Exception while reading key value for {}: {}", k, t.getMessage());
             }
 
             String escaped = StringEscapeHelpers.escapeHtml4WithoutSpecialCharacters(val);
-            logger.debug("escaped: " + escaped);
+
             map.put(k, escaped);
         }
 
@@ -258,37 +237,28 @@ public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDat
         Matcher m = p.matcher(template);
         while (m.find()) {
             String k = m.group().subSequence(1, m.group().length() - 1).toString();
-            if (!keys.contains(k))
-                keys.add(k);
+            if (!keys.contains(k)) keys.add(k);
         }
 
         return keys;
     }
 
-    ////// OLD METHODS - START /////////
     @Deprecated
     private String getHtmlFromTemplateAndData(String htmlTemplate, Map<String, Object> data) {
-        logger.debug("Json Object contains " + data.entrySet().size() + " properties.");
+
         for (Entry<String, Object> e : data.entrySet()) {
-            // logger.debug(e.getKey() + ":" + e.getValue());
             htmlTemplate = htmlTemplate.replaceAll("\\{" + e.getKey() + "\\}", (String) e.getValue());
-            // logger.debug("HTML Template: " + htmlTemplate);
         }
 
-        logger.debug("Final HTML Template: " + htmlTemplate);
 
         return htmlTemplate;
     }
 
     @Deprecated
     private String transformTemplate(String template, String json) {
-        logger.info("Json Obj: " + json);
-
         List<String> keys = getUniqueKeysFromTemplate(template);
         Map<String, String> keyVals = getValuesFromJson(keys, json);
 
         return transformTemplate(template, keyVals);
     }
-    ////// OLD METHODS - END /////////
-
 }

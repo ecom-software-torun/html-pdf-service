@@ -25,7 +25,7 @@
  */
 package org.farrukh.mirza.pdf.rest;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.farrukh.mirza.pdf.rest.dto.PdfRequest;
 import org.farrukh.mirza.pdf.spi.Converter;
@@ -36,8 +36,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -65,9 +65,6 @@ public class HtmlPdfResource {
             html = StringEscapeUtils.unescapeHtml4(html);
             css = StringUtils.isBlank(css) ? "" : StringEscapeUtils.unescapeHtml4(css);
             json = StringUtils.isBlank(json) ? "" : StringEscapeUtils.unescapeHtml4(json);
-            logger.debug("HTML: " + html);
-            logger.debug("CSS: " + css);
-            logger.debug("JSON: " + json);
 
             boolean isMultipleDocs = false;
             List<String> htmls = new ArrayList<>();
@@ -100,7 +97,6 @@ public class HtmlPdfResource {
             @RequestParam("html") String html,
             @RequestParam(name = "css", required = false) String css,
             @RequestParam(name = "json", required = false) String json) {
-        logger.debug("This will convert html and css request params to pdf in http servlet response.");
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -129,7 +125,6 @@ public class HtmlPdfResource {
     @RequestMapping(value = "params/byte", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public byte[] convertHtmlToPdf(@RequestParam("html") String html, HttpServletRequest req) {
-        logger.debug("This will convert html and css request params to pdf and return as byte array.");
 
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -158,7 +153,6 @@ public class HtmlPdfResource {
      */
     @RequestMapping(value = "body", method = RequestMethod.POST)
     public void convertHtmlToPdf(@RequestBody PdfRequest reqBody, HttpServletResponse resp) {
-        logger.debug("This will convert html and css request body to pdf in http servlet response.");
 
         try {
             resp.setContentType("application/pdf");
@@ -179,7 +173,6 @@ public class HtmlPdfResource {
     @RequestMapping(value = "body/byte", method = RequestMethod.POST)
     @ResponseBody
     public byte[] convertHtmlToPdf(@RequestBody PdfRequest reqBody) {
-        logger.debug("This will convert html and css request params to pdf and return as byte array.");
 
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
