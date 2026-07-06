@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
-<head th:replace="inc/header"></head>
+<head th:replace="~{inc/header}"></head>
 <body>
 
 
@@ -130,7 +130,7 @@
 
 
 
-	<footer th:replace="inc/footer"></footer>
+	<footer th:replace="~{inc/footer}"></footer>
 	<script th:src="@{/public/lib/downloader/js/html.ajax.binary.downloader.js}"></script>
 	<script th:src="@{/public/lib/downloader/js/xhr.ajax.binary.downloader.js}"></script>
 	<script th:src="@{/public/pages/index/js/index.js}"></script>
